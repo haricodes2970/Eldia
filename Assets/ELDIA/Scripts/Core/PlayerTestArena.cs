@@ -111,6 +111,8 @@ public sealed class PlayerTestArena : MonoBehaviour
 
         // Add attack component to player
         player.AddComponent<PlayerAttack>();
+        PlayerGun gun = player.AddComponent<PlayerGun>();
+        gun.Configure(facing.transform);
     }
 
     private void CreateEnemy()
