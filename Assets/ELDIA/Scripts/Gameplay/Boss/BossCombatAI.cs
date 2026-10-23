@@ -119,6 +119,7 @@ namespace ELDIA.Gameplay.Boss
                     if (stateTimer <= 0f)
                     {
                         ApplyAttackOnce();
+                        SetRecoveryVisual();
                         state = State.Recovery;
                         stateTimer = recoveryDuration;
                     }
@@ -173,13 +174,15 @@ namespace ELDIA.Gameplay.Boss
 
             attackApplied = true;
             Vector2 direction = ((Vector2)target.position - body.position).normalized;
+            Vector2 attackPosition = body.position;
             if (useDashAttack)
             {
-                body.MovePosition(body.position + direction * dashDistance);
+                attackPosition += direction * dashDistance;
+                body.MovePosition(attackPosition);
             }
 
-            float hitDistance = useDashAttack ? attackRange + dashDistance : attackRange + 0.2f;
-            if (Vector2.Distance(transform.position, target.position) > hitDistance)
+            float hitDistance = useDashAttack ? attackRange + 0.2f : attackRange + 0.2f;
+            if (Vector2.Distance(attackPosition, target.position) > hitDistance)
             {
                 return;
             }
@@ -208,13 +211,18 @@ namespace ELDIA.Gameplay.Boss
             RestoreVisual();
         }
 
-        private void RestoreVisual()
+        private void SetRecoveryVisual()
         {
             if (spriteRenderer != null && state != State.Defeated)
             {
                 spriteRenderer.color = aliveColor;
                 transform.localScale = Vector3.one;
             }
+        }
+
+        private void RestoreVisual()
+        {
+            SetRecoveryVisual();
         }
 
         private bool IsTerminal()

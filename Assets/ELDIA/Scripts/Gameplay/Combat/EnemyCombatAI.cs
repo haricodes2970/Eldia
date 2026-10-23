@@ -116,6 +116,7 @@ namespace ELDIA.Gameplay.Combat
                     {
                         state = State.Attack;
                         ApplyAttackOnce();
+                        SetRecoveryVisual();
                         stateTimer = recoveryDuration;
                     }
                     break;
@@ -198,13 +199,18 @@ namespace ELDIA.Gameplay.Combat
             }
         }
 
-        private void RestoreVisual()
+        private void SetRecoveryVisual()
         {
             if (spriteRenderer != null)
             {
                 spriteRenderer.color = aliveColor;
                 transform.localScale = Vector3.one;
             }
+        }
+
+        private void RestoreVisual()
+        {
+            SetRecoveryVisual();
         }
 
         private bool IsTerminal()
