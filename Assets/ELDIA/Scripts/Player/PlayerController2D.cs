@@ -10,8 +10,18 @@ public sealed class PlayerController2D : MonoBehaviour
     private Rigidbody2D body;
     private Vector2 movementInput;
     private Vector2 facingDirection = Vector2.down;
+    private bool gameplayEnabled = true;
 
     public Vector2 FacingDirection => facingDirection;
+
+    public void SetGameplayEnabled(bool enabled)
+    {
+        gameplayEnabled = enabled;
+        if (!enabled)
+        {
+            movementInput = Vector2.zero;
+        }
+    }
     public Vector2 MovementInput => movementInput;
 
     private void Awake()
@@ -24,6 +34,12 @@ public sealed class PlayerController2D : MonoBehaviour
 
     private void Update()
     {
+        if (!gameplayEnabled)
+        {
+            movementInput = Vector2.zero;
+            return;
+        }
+
         movementInput = NormalizeInput(new Vector2(
             Input.GetAxisRaw("Horizontal"),
             Input.GetAxisRaw("Vertical")));
@@ -37,6 +53,11 @@ public sealed class PlayerController2D : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (!gameplayEnabled)
+        {
+            return;
+        }
+
         body.MovePosition(body.position + movementInput * moveSpeed * Time.fixedDeltaTime);
     }
 

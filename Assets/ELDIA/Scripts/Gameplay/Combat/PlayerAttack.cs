@@ -19,6 +19,12 @@ namespace ELDIA.Gameplay.Combat
 
         private PlayerController2D playerController;
         private float nextAttackTime;
+        private bool gameplayEnabled = true;
+
+        public void SetGameplayEnabled(bool enabled)
+        {
+            gameplayEnabled = enabled;
+        }
         private readonly HashSet<IDamageable> hitTargetsThisAttack = new HashSet<IDamageable>();
 
         private void Awake()
@@ -28,6 +34,11 @@ namespace ELDIA.Gameplay.Combat
 
         private void Update()
         {
+            if (!gameplayEnabled)
+            {
+                return;
+            }
+
             if (Input.GetButtonDown(attackInputName) && Time.time >= nextAttackTime)
             {
                 PerformAttack();

@@ -19,6 +19,7 @@ public sealed class PlayerTestArena : MonoBehaviour
     private Transform generatedRoot;
     private GameObject player;
     private SimulationObjective objective;
+    private GameObject enemyObject;
     private BasicBoss boss;
     private MissionCoordinator missionCoordinator;
 
@@ -101,19 +102,23 @@ public sealed class PlayerTestArena : MonoBehaviour
         HealthComponent playerHealth = player.AddComponent<HealthComponent>();
         playerHealth.SetMaxHealth(100);
 
-        // Add attack component to player
+        // Add attack and defeat-state components to player
         player.AddComponent<PlayerAttack>();
+        player.AddComponent<PlayerCombatState>();
     }
 
     private void CreateEnemy()
     {
         GameObject enemy = CreateSpriteObject("Enemy", new Vector3(2f, 0f, 0f), Vector2.one, enemyColor);
+        enemy.AddComponent<Rigidbody2D>();
         enemy.AddComponent<BoxCollider2D>();
 
         var health = enemy.AddComponent<HealthComponent>();
         health.SetMaxHealth(50);
 
-        enemy.AddComponent<BasicEnemy>();
+        enemyObject = enemy;
+        enemyObject.AddComponent<BasicEnemy>();
+        enemyObject.AddComponent<EnemyCombatAI>();
     }
 
     private void CreateSimulationObjective()
@@ -137,11 +142,13 @@ public sealed class PlayerTestArena : MonoBehaviour
             new Vector2(1.5f, 1.5f),
             new Color(0.75f, 0.1f, 0.95f, 1f));
 
+        bossObject.AddComponent<Rigidbody2D>();
         bossObject.AddComponent<BoxCollider2D>();
         HealthComponent health = bossObject.AddComponent<HealthComponent>();
         health.SetMaxHealth(150);
         health.ResetHealth();
         boss = bossObject.AddComponent<BasicBoss>();
+        bossObject.AddComponent<BossCombatAI>();
     }
 
     private void CreateMissionCoordinator()
@@ -149,6 +156,15 @@ public sealed class PlayerTestArena : MonoBehaviour
         GameObject coordinatorObject = CreateGeneratedObject("Mission Coordinator");
         missionCoordinator = coordinatorObject.AddComponent<MissionCoordinator>();
         missionCoordinator.Configure(objective, boss);
+
+        PlayerCombatState playerState = player.GetComponent<PlayerCombatState>();
+        playerState.Configure(missionCoordinator);
+
+        EnemyCombatAI enemyAI = enemyObject.GetComponent<EnemyCombatAI>();
+        enemyAI.Configure(player.transform, missionCoordinator);
+
+        BossCombatAI bossAI = boss.GetComponent<BossCombatAI>();
+        bossAI.Configure(player.transform, missionCoordinator);
     }
 
     private void CreateCamera()
@@ -187,9 +203,9 @@ public sealed class PlayerTestArena : MonoBehaviour
             Debug.LogError("PlayerTestArena: objective mission wiring is incomplete.", this);
         }
 
-        if (boss == null || boss.GetComponent<HealthComponent>() == null)
+        if (boss == null || boss.GetComponent<HealthComponent>() == null || boss.GetComponent<BossCombatAI>() == null)
         {
-            Debug.LogError("PlayerTestArena: boss setup is missing BasicBoss or HealthComponent.", this);
+            Debug.LogError("PlayerTestArena: boss setup is missing BasicBoss, BossCombatAI or HealthComponent.", this);
         }
     }
 
