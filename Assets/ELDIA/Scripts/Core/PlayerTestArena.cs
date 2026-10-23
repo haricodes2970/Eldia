@@ -6,6 +6,7 @@ using ELDIA.Gameplay.Boss;
 using ELDIA.Gameplay.Mission;
 using ELDIA.Gameplay.Presentation;
 using ELDIA.Gameplay.Reset;
+using ELDIA.Audio;
 
 public sealed class PlayerTestArena : MonoBehaviour
 {
@@ -35,6 +36,7 @@ public sealed class PlayerTestArena : MonoBehaviour
         CleanupGeneratedArena();
         generatedRoot = new GameObject("Generated Arena").transform;
         generatedRoot.SetParent(transform, false);
+        generatedRoot.gameObject.AddComponent<MusicPlayer>();
 
         CreateBackground();
         CreateFloor();
