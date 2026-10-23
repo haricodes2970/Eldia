@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "game-developer": {
+      "source": "farmage/opencode-skills",
+      "sourceType": "github",
+      "skillPath": "skills/game-developer/SKILL.md",
+      "computedHash": "dfd11f28bf9d2b0b2632a415eb2b2e299db9f15f211ecff215233367b0efdf28"
+    }
+  }
+}
