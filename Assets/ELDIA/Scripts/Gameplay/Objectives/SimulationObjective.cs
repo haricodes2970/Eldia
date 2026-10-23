@@ -15,6 +15,8 @@ namespace ELDIA.Gameplay.Objectives
         [SerializeField] private Color activeColor = new Color(0.1f, 0.85f, 1f, 1f);
         [SerializeField] private Color disabledColor = new Color(0.2f, 0.25f, 0.3f, 1f);
         [SerializeField, Min(0.1f)] private float disabledScale = 0.8f;
+        [SerializeField] private string activeStateLabel = "INTRUSION TARGET";
+        [SerializeField] private string completedStateLabel = "SIMULATION NODE BREACHED";
 
         private SpriteRenderer nodeRenderer;
         private Vector3 activeScale;
@@ -22,6 +24,7 @@ namespace ELDIA.Gameplay.Objectives
 
         public string ObjectiveId => objectiveId;
         public bool IsCompleted => isCompleted;
+        public string StateLabel => isCompleted ? completedStateLabel : activeStateLabel;
 
         public event Action<ObjectiveCompletedEvent> Completed;
 

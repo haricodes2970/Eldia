@@ -16,6 +16,7 @@ namespace ELDIA.Gameplay.Mission
 
         private IObjective objective;
         private IBoss boss;
+        private IHealth playerHealth;
         private GameState currentState = GameState.Intro;
         private bool hasWon;
         private bool objectiveCompleted;
@@ -36,9 +37,15 @@ namespace ELDIA.Gameplay.Mission
         /// </summary>
         public void Configure(IObjective missionObjective, IBoss missionBoss)
         {
+            Configure(missionObjective, missionBoss, null);
+        }
+
+        public void Configure(IObjective missionObjective, IBoss missionBoss, IHealth missionPlayerHealth)
+        {
             UnsubscribeFromEvents();
             objective = missionObjective;
             boss = missionBoss;
+            playerHealth = missionPlayerHealth;
             RefreshCompletionState();
             SubscribeToEvents();
         }
@@ -124,6 +131,11 @@ namespace ELDIA.Gameplay.Mission
 
             objective.Completed += OnObjectiveCompleted;
             boss.Defeated += OnBossDefeated;
+            if (playerHealth != null)
+            {
+                playerHealth.Defeated += OnPlayerDefeated;
+            }
+
             eventsSubscribed = true;
         }
 
@@ -144,6 +156,11 @@ namespace ELDIA.Gameplay.Mission
                 boss.Defeated -= OnBossDefeated;
             }
 
+            if (playerHealth != null)
+            {
+                playerHealth.Defeated -= OnPlayerDefeated;
+            }
+
             eventsSubscribed = false;
         }
 
@@ -157,6 +174,11 @@ namespace ELDIA.Gameplay.Mission
         {
             RefreshCompletionState();
             EvaluateVictory();
+        }
+
+        private void OnPlayerDefeated(EntityDefeatedEvent payload)
+        {
+            TrySetState(GameState.PlayerDefeated);
         }
     }
 }

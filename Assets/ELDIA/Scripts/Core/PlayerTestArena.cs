@@ -18,12 +18,20 @@ public sealed class PlayerTestArena : MonoBehaviour
 
     private Transform generatedRoot;
     private GameObject player;
+    private bool initialized;
+    private Camera generatedCamera;
     private SimulationObjective objective;
     private BasicBoss boss;
     private MissionCoordinator missionCoordinator;
 
     private void Awake()
     {
+        if (initialized)
+        {
+            return;
+        }
+
+        initialized = true;
         CleanupGeneratedArena();
         generatedRoot = new GameObject("Generated Arena").transform;
         generatedRoot.SetParent(transform, false);
@@ -43,16 +51,16 @@ public sealed class PlayerTestArena : MonoBehaviour
 
     private void CleanupGeneratedArena()
     {
+        if (generatedCamera != null)
+        {
+            Destroy(generatedCamera.gameObject);
+            generatedCamera = null;
+        }
+
         Transform existing = transform.Find("Generated Arena");
         if (existing != null)
         {
             Destroy(existing.gameObject);
-        }
-
-        GameObject existingCamera = GameObject.Find("Main Camera");
-        if (existingCamera != null)
-        {
-            Destroy(existingCamera);
         }
     }
 
@@ -95,7 +103,7 @@ public sealed class PlayerTestArena : MonoBehaviour
         facing.transform.SetParent(player.transform, false);
 
         PlayerController2D controller = player.AddComponent<PlayerController2D>();
-        SetPrivateField(controller, "facingIndicator", facing.transform);
+        controller.Configure(facing.transform);
 
         // Add health component to player
         HealthComponent playerHealth = player.AddComponent<HealthComponent>();
@@ -148,7 +156,7 @@ public sealed class PlayerTestArena : MonoBehaviour
     {
         GameObject coordinatorObject = CreateGeneratedObject("Mission Coordinator");
         missionCoordinator = coordinatorObject.AddComponent<MissionCoordinator>();
-        missionCoordinator.Configure(objective, boss);
+        missionCoordinator.Configure(objective, boss, player.GetComponent<HealthComponent>());
     }
 
     private void CreateCamera()
@@ -156,12 +164,13 @@ public sealed class PlayerTestArena : MonoBehaviour
         GameObject cameraObject = new GameObject("Main Camera");
         cameraObject.tag = "MainCamera";
         cameraObject.transform.position = new Vector3(-5f, 0f, -10f);
+        cameraObject.transform.SetParent(generatedRoot, true);
 
-        Camera camera = cameraObject.AddComponent<Camera>();
-        camera.orthographic = true;
-        camera.orthographicSize = 6.5f;
-        camera.clearFlags = CameraClearFlags.SolidColor;
-        camera.backgroundColor = backgroundColor;
+        generatedCamera = cameraObject.AddComponent<Camera>();
+        generatedCamera.orthographic = true;
+        generatedCamera.orthographicSize = 6.5f;
+        generatedCamera.clearFlags = CameraClearFlags.SolidColor;
+        generatedCamera.backgroundColor = backgroundColor;
 
         CameraFollow2D follow = cameraObject.AddComponent<CameraFollow2D>();
         follow.Configure(player.transform);
@@ -220,12 +229,4 @@ public sealed class PlayerTestArena : MonoBehaviour
         return Sprite.Create(texture, new Rect(0f, 0f, 1f, 1f), new Vector2(0.5f, 0.5f), 1f);
     }
 
-    private static void SetPrivateField(Object target, string fieldName, Object value)
-    {
-        System.Reflection.FieldInfo field = target.GetType().GetField(
-            fieldName,
-            System.Reflection.BindingFlags.Instance |
-            System.Reflection.BindingFlags.NonPublic);
-        field?.SetValue(target, value);
-    }
 }

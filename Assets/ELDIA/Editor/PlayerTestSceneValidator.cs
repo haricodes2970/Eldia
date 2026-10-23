@@ -30,9 +30,15 @@ namespace ELDIA.Editor
             }
 
             var scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
-            if (Object.FindObjectOfType<PlayerTestArena>() == null)
+            PlayerTestArena arena = Object.FindObjectOfType<PlayerTestArena>();
+            if (arena == null)
             {
                 throw new InvalidDataException("PlayerTestArena component missing from scene.");
+            }
+
+            if (arena.GetComponent<Transform>() == null)
+            {
+                throw new InvalidDataException("PlayerTestArena is missing its Transform component.");
             }
 
             string[] requiredScripts =

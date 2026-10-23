@@ -14,6 +14,11 @@ public sealed class PlayerController2D : MonoBehaviour
     public Vector2 FacingDirection => facingDirection;
     public Vector2 MovementInput => movementInput;
 
+    public void Configure(Transform configuredFacingIndicator)
+    {
+        facingIndicator = configuredFacingIndicator;
+    }
+
     private void Awake()
     {
         body = GetComponent<Rigidbody2D>();

@@ -11,6 +11,12 @@ namespace ELDIA.Gameplay.Objectives
     {
         [SerializeField] private SimulationObjective objective;
         [SerializeField, Min(0.1f)] private float interactionRange = 1.5f;
+        [SerializeField] private string interactionPrompt = "Press E to breach terminal";
+
+        public string InteractionPrompt => interactionPrompt;
+        public bool IsInteractionAvailable => objective != null &&
+            !objective.IsCompleted &&
+            Vector2.Distance(transform.position, objective.transform.position) <= interactionRange;
 
         public void Configure(SimulationObjective configuredObjective)
         {
